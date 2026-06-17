@@ -1,25 +1,38 @@
 package com.example.orderproxy.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
+@RequiredArgsConstructor
 public class AppConfig {
 
-    @Value("${rest-client.connect-timeout}")
-    private int connectTimeout;
-
-    @Value("${rest-client.read-timeout}")
-    private int readTimeout;
+    private final RestClientProperties properties;
 
     @Bean
-    public RestTemplate restTemplate() {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(connectTimeout);
-        factory.setReadTimeout(readTimeout);
-        return new RestTemplate(factory);
+    public WebClient webClient() {
+
+        HttpClient httpClient = HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, properties.getConnectTimeout())
+                .responseTimeout(Duration.ofMillis(properties.getReadTimeout()))
+                .doOnConnected(conn ->
+                        conn.addHandlerLast(
+                                new ReadTimeoutHandler(properties.getReadTimeout(), TimeUnit.MILLISECONDS)
+                        )
+                );
+
+        return WebClient.builder()
+                .baseUrl(properties.getBaseUrl())
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
     }
 }

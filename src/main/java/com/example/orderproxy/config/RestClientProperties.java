@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "rest-client")
 public class RestClientProperties {
+
+    private String baseUrl;
     private int connectTimeout;
     private int readTimeout;
-    private int maxAttempts;
-    private long backoffDelay;
 }

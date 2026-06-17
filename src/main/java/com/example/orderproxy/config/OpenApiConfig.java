@@ -10,11 +10,11 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
 
     @Bean
-    public OpenAPI orderServiceOpenAPI() {
+    public OpenAPI orderProxyOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Order Service API")
-                        .description("CRUD API для управления заказами (JPA / JDBC)")
+                        .title("Order Proxy API")
+                        .description("Proxy API для взаимодействия с Order Service")
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Jeexike")
