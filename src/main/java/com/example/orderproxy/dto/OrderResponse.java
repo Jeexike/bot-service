@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 @Data
-@JsonPropertyOrder({"id", "name", "source", "destination", "createdAt", "updatedAt"})
+@JsonPropertyOrder({"id", "name", "source", "destination", "partnerId", "createdAt", "updatedAt"})
 @Schema(description = "Ответ с данными заказа")
 public class OrderResponse {
 
@@ -23,6 +23,9 @@ public class OrderResponse {
 
     @Schema(description = "Точка назначения", example = "Санкт-Петербург")
     private String destination;
+
+    @Schema(description = "ID партнера")
+    private UUID partnerId;
 
     @Schema(description = "Время создания")
     private Timestamp createdAt;

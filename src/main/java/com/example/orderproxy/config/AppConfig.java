@@ -3,6 +3,7 @@ package com.example.orderproxy.config;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -20,7 +21,16 @@ public class AppConfig {
 
     @Bean
     public WebClient webClient() {
+        return buildWebClient(properties.getBaseUrl());
+    }
 
+    @Bean
+    @Qualifier("partnerWebClient")
+    public WebClient partnerWebClient() {
+        return buildWebClient(properties.getPartnersBaseUrl());
+    }
+
+    private WebClient buildWebClient(String baseUrl) {
         HttpClient httpClient = HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, properties.getConnectTimeout())
                 .responseTimeout(Duration.ofMillis(properties.getReadTimeout()))
@@ -31,7 +41,7 @@ public class AppConfig {
                 );
 
         return WebClient.builder()
-                .baseUrl(properties.getBaseUrl())
+                .baseUrl(baseUrl)
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
     }

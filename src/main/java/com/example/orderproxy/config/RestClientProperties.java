@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class RestClientProperties {
 
     private String baseUrl;
+    private String partnersBaseUrl;
     private int connectTimeout;
     private int readTimeout;
 }
