@@ -3,6 +3,8 @@ package com.example.orderproxy.controller;
 import com.example.orderproxy.client.OrderClient;
 import com.example.orderproxy.dto.OrderRequest;
 import com.example.orderproxy.dto.OrderResponse;
+import com.example.orderproxy.util.SafeResultActions;
+import com.example.orderproxy.util.TestDataFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,20 +41,16 @@ class OrderControllerTest {
 
     @Test
     @DisplayName("GET /orders/{id} -> 200")
-    void getOrder_ShouldReturn200() throws Exception {
+    void getOrder_ShouldReturn200() {
 
         UUID id = UUID.randomUUID();
-
-        OrderResponse response = new OrderResponse();
-        response.setId(id);
-        response.setName("Order");
-        response.setSource("Moscow");
-        response.setDestination("SPB");
+        OrderResponse response = TestDataFactory.orderResponse(id);
 
         when(orderClient.getOrder(id)).thenReturn(response);
 
-        mockMvc.perform(get("/orders/{id}", id))
-                .andExpect(status().isOk())
+        SafeResultActions result = perform(get("/orders/{id}", id));
+
+        result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.name").value("Order"))
                 .andExpect(jsonPath("$.source").value("Moscow"))
@@ -62,25 +61,16 @@ class OrderControllerTest {
 
     @Test
     @DisplayName("GET /orders -> 200")
-    void getOrders_ShouldReturn200() throws Exception {
+    void getOrders_ShouldReturn200() {
 
-        OrderResponse first = new OrderResponse();
-        first.setId(UUID.randomUUID());
-        first.setName("First");
-        first.setSource("Moscow");
-        first.setDestination("SPB");
+        OrderResponse first = TestDataFactory.orderResponse(UUID.randomUUID());
+        OrderResponse second = TestDataFactory.orderResponse(UUID.randomUUID());
 
-        OrderResponse second = new OrderResponse();
-        second.setId(UUID.randomUUID());
-        second.setName("Second");
-        second.setSource("Kazan");
-        second.setDestination("Omsk");
+        when(orderClient.getOrders()).thenReturn(List.of(first, second));
 
-        when(orderClient.getOrders())
-                .thenReturn(List.of(first, second));
+        SafeResultActions result = perform(get("/orders"));
 
-        mockMvc.perform(get("/orders"))
-                .andExpect(status().isOk())
+        result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
 
         verify(orderClient).getOrders();
@@ -88,30 +78,19 @@ class OrderControllerTest {
 
     @Test
     @DisplayName("POST /orders -> 201")
-    void createOrder_ShouldReturn201() throws Exception {
+    void createOrder_ShouldReturn201() {
 
         UUID partnerId = UUID.randomUUID();
+        OrderRequest request = TestDataFactory.orderRequest(partnerId);
+        OrderResponse response = TestDataFactory.orderResponse(UUID.randomUUID(), partnerId);
 
-        OrderRequest request = new OrderRequest();
-        request.setName("Order");
-        request.setSource("Moscow");
-        request.setDestination("SPB");
-        request.setPartnerId(partnerId);
+        when(orderClient.createOrder(any(OrderRequest.class))).thenReturn(response);
 
-        OrderResponse response = new OrderResponse();
-        response.setId(UUID.randomUUID());
-        response.setName("Order");
-        response.setSource("Moscow");
-        response.setDestination("SPB");
-        response.setPartnerId(partnerId);
+        SafeResultActions result = perform(post("/orders")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)));
 
-        when(orderClient.createOrder(any(OrderRequest.class)))
-                .thenReturn(response);
-
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
+        result.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Order"))
                 .andExpect(jsonPath("$.source").value("Moscow"))
                 .andExpect(jsonPath("$.destination").value("SPB"))
@@ -122,50 +101,67 @@ class OrderControllerTest {
 
     @Test
     @DisplayName("POST /orders невалидное тело -> 400")
-    void createOrder_ShouldReturn400_WhenValidationFails() throws Exception {
+    void createOrder_ShouldReturn400_WhenValidationFails() {
 
-        OrderRequest request = new OrderRequest();
-        request.setName("");
-        request.setSource("A");
-        request.setDestination("B");
+        OrderRequest request = TestDataFactory.invalidOrderRequest();
 
-        mockMvc.perform(post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+        SafeResultActions result = perform(post("/orders")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)));
+
+        result.andExpect(status().isBadRequest());
 
         verifyNoInteractions(orderClient);
     }
 
     @Test
     @DisplayName("GET /orders/{id} с невалидным ID -> 400")
-    void getOrder_nonUuidId_returnsBadRequest() throws Exception {
+    void getOrder_nonUuidId_returnsBadRequest() {
 
-        mockMvc.perform(get("/orders/{id}", "not-a-uuid"))
-                .andExpect(status().isBadRequest());
+        SafeResultActions result = perform(get("/orders/{id}", "not-a-uuid"));
+
+        result.andExpect(status().isBadRequest());
 
         verifyNoInteractions(orderClient);
     }
 
     @Test
     @DisplayName("DELETE /orders/{id} -> 204")
-    void deleteOrder_ShouldReturn204() throws Exception {
+    void deleteOrder_ShouldReturn204() {
 
         UUID id = UUID.randomUUID();
 
-        mockMvc.perform(delete("/orders/{id}", id))
-                .andExpect(status().isNoContent());
+        SafeResultActions result = perform(delete("/orders/{id}", id));
+
+        result.andExpect(status().isNoContent());
 
         verify(orderClient).deleteOrder(id);
     }
 
     @Test
     @DisplayName("DELETE /orders/{id} с невалидным ID -> 400")
-    void deleteOrder_nonUuidId_returnsBadRequest() throws Exception {
+    void deleteOrder_nonUuidId_returnsBadRequest() {
 
-        mockMvc.perform(delete("/orders/{id}", "not-a-uuid"))
-                .andExpect(status().isBadRequest());
+        SafeResultActions result = perform(delete("/orders/{id}", "not-a-uuid"));
+
+        result.andExpect(status().isBadRequest());
 
         verifyNoInteractions(orderClient);
+    }
+
+    private SafeResultActions perform(MockHttpServletRequestBuilder requestBuilder) {
+        try {
+            return new SafeResultActions(mockMvc.perform(requestBuilder));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String toJson(Object value) {
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
