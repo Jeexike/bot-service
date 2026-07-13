@@ -2,10 +2,9 @@ package com.example.orderproxy.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.sql.Timestamp;
 import java.util.UUID;
+import lombok.Data;
 
 @Data
 @JsonPropertyOrder({"id", "name", "source", "destination", "partnerId", "createdAt", "updatedAt"})

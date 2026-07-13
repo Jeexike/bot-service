@@ -16,9 +16,6 @@ public class OpenApiConfig {
                         .title("Order Proxy API")
                         .description("Proxy API для взаимодействия с Order Service")
                         .version("1.0.0")
-                        .contact(new Contact()
-                                .name("Jeexike")
-                                .email("jeex1ke@gmail.com"))
-                );
+                        .contact(new Contact().name("Jeexike").email("jeex1ke@gmail.com")));
     }
 }

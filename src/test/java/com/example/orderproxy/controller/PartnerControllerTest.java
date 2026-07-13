@@ -1,5 +1,12 @@
 package com.example.orderproxy.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.example.orderproxy.client.PartnerClient;
 import com.example.orderproxy.dto.OrderResponse;
 import com.example.orderproxy.dto.PartnerRequest;
@@ -7,6 +14,8 @@ import com.example.orderproxy.dto.PartnerResponse;
 import com.example.orderproxy.util.SafeResultActions;
 import com.example.orderproxy.util.TestDataFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,16 +27,6 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-
-import java.util.List;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(PartnerController.class)
 @EnableRetry
@@ -52,9 +51,8 @@ class PartnerControllerTest {
 
         Mockito.when(partnerClient.createPartner(any())).thenReturn(response);
 
-        SafeResultActions result = perform(post("/partners")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(request)));
+        SafeResultActions result = perform(
+                post("/partners").contentType(MediaType.APPLICATION_JSON).content(toJson(request)));
 
         result.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(id.toString()))
@@ -68,9 +66,8 @@ class PartnerControllerTest {
 
         PartnerRequest request = TestDataFactory.invalidPartnerRequest();
 
-        SafeResultActions result = perform(post("/partners")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(request)));
+        SafeResultActions result = perform(
+                post("/partners").contentType(MediaType.APPLICATION_JSON).content(toJson(request)));
 
         result.andExpect(status().isBadRequest());
 
@@ -84,8 +81,7 @@ class PartnerControllerTest {
         UUID partnerId = UUID.randomUUID();
         OrderResponse order = TestDataFactory.orderResponse(UUID.randomUUID(), partnerId);
 
-        Mockito.when(partnerClient.getOrdersByPartnerId(eq(partnerId)))
-                .thenReturn(List.of(order));
+        Mockito.when(partnerClient.getOrdersByPartnerId(eq(partnerId))).thenReturn(List.of(order));
 
         SafeResultActions result = perform(get("/partners/{id}/orders", partnerId));
 

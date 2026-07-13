@@ -8,8 +8,7 @@ import org.springframework.retry.annotation.EnableRetry;
 @SpringBootApplication
 public class OrderProxyApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OrderProxyApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(OrderProxyApplication.class, args);
+    }
 }

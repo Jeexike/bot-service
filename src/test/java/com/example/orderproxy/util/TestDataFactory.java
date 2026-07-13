@@ -4,13 +4,11 @@ import com.example.orderproxy.dto.OrderRequest;
 import com.example.orderproxy.dto.OrderResponse;
 import com.example.orderproxy.dto.PartnerRequest;
 import com.example.orderproxy.dto.PartnerResponse;
-
 import java.util.UUID;
 
 public final class TestDataFactory {
 
-    private TestDataFactory() {
-    }
+    private TestDataFactory() {}
 
     public static OrderRequest orderRequest() {
         return orderRequest("Order", "Moscow", "SPB", null);

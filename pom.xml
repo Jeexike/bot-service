@@ -69,6 +69,12 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+		<groupId>com.diffplug.spotless</groupId>
+		<artifactId>spotless-maven-plugin</artifactId>
+		<version>3.8.0</version>
+		<scope>compile</scope>
+	</dependency>
 	</dependencies>
 
 	<build>
@@ -120,6 +126,16 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<java>
+						<palantirJavaFormat/>
+					</java>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

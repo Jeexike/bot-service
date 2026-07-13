@@ -1,23 +1,5 @@
 package com.example.orderproxy.controller;
 
-import com.example.orderproxy.client.OrderClient;
-import com.example.orderproxy.dto.OrderRequest;
-import com.example.orderproxy.dto.OrderResponse;
-import com.example.orderproxy.util.SafeResultActions;
-import com.example.orderproxy.util.TestDataFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-
-import java.util.List;
-import java.util.UUID;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -27,6 +9,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.example.orderproxy.client.OrderClient;
+import com.example.orderproxy.dto.OrderRequest;
+import com.example.orderproxy.dto.OrderResponse;
+import com.example.orderproxy.util.SafeResultActions;
+import com.example.orderproxy.util.TestDataFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @WebMvcTest(OrderController.class)
 class OrderControllerTest {
@@ -70,8 +69,7 @@ class OrderControllerTest {
 
         SafeResultActions result = perform(get("/orders"));
 
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2));
+        result.andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2));
 
         verify(orderClient).getOrders();
     }
@@ -86,9 +84,8 @@ class OrderControllerTest {
 
         when(orderClient.createOrder(any(OrderRequest.class))).thenReturn(response);
 
-        SafeResultActions result = perform(post("/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(request)));
+        SafeResultActions result =
+                perform(post("/orders").contentType(MediaType.APPLICATION_JSON).content(toJson(request)));
 
         result.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Order"))
@@ -105,9 +102,8 @@ class OrderControllerTest {
 
         OrderRequest request = TestDataFactory.invalidOrderRequest();
 
-        SafeResultActions result = perform(post("/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(request)));
+        SafeResultActions result =
+                perform(post("/orders").contentType(MediaType.APPLICATION_JSON).content(toJson(request)));
 
         result.andExpect(status().isBadRequest());
 

@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Backoff;
@@ -24,9 +26,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 
-import java.util.List;
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
@@ -38,14 +37,13 @@ public class OrderController {
     @GetMapping("/{id}")
     @Operation(summary = "Получить заказ по ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Заказ найден"),
-            @ApiResponse(responseCode = "404", description = "Заказ не найден")
+        @ApiResponse(responseCode = "200", description = "Заказ найден"),
+        @ApiResponse(responseCode = "404", description = "Заказ не найден")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}")
-    )
+            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     public OrderResponse getOrder(@Parameter(description = "ID заказа") @PathVariable UUID id) {
         return orderClient.getOrder(id);
     }
@@ -55,8 +53,7 @@ public class OrderController {
     @Retryable(
             retryFor = WebClientRequestException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}")
-    )
+            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     public List<OrderResponse> getOrders() {
         return orderClient.getOrders();
     }
@@ -65,14 +62,13 @@ public class OrderController {
     @Operation(summary = "Создать новый заказ")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Заказ создан"),
-            @ApiResponse(responseCode = "400", description = "Невалидные данные")
+        @ApiResponse(responseCode = "200", description = "Заказ создан"),
+        @ApiResponse(responseCode = "400", description = "Невалидные данные")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}")
-    )
+            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     public OrderResponse createOrder(@Valid @RequestBody OrderRequest orderRequest) {
         return orderClient.createOrder(orderRequest);
     }
@@ -80,19 +76,17 @@ public class OrderController {
     @PutMapping("/{id}")
     @Operation(summary = "Обновить существующий заказ")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Заказ обновлён"),
-            @ApiResponse(responseCode = "404", description = "Заказ не найден"),
-            @ApiResponse(responseCode = "400", description = "Невалидные данные")
+        @ApiResponse(responseCode = "200", description = "Заказ обновлён"),
+        @ApiResponse(responseCode = "404", description = "Заказ не найден"),
+        @ApiResponse(responseCode = "400", description = "Невалидные данные")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}")
-    )
+            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     public OrderResponse updateOrder(
             @Parameter(description = "ID заказа") @PathVariable UUID id,
-            @Valid @RequestBody OrderRequest orderRequest
-    ) {
+            @Valid @RequestBody OrderRequest orderRequest) {
         return orderClient.updateOrder(id, orderRequest);
     }
 
@@ -100,14 +94,13 @@ public class OrderController {
     @Operation(summary = "Удалить заказ")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Заказ удалён"),
-            @ApiResponse(responseCode = "404", description = "Заказ не найден")
+        @ApiResponse(responseCode = "200", description = "Заказ удалён"),
+        @ApiResponse(responseCode = "404", description = "Заказ не найден")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}")
-    )
+            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     public void deleteOrder(@Parameter(description = "ID заказа") @PathVariable UUID id) {
         orderClient.deleteOrder(id);
     }

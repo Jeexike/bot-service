@@ -1,10 +1,9 @@
 package com.example.orderproxy.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.sql.Timestamp;
 import java.util.UUID;
+import lombok.Data;
 
 @Data
 @Schema(description = "Partner response")

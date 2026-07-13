@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Backoff;
@@ -24,9 +26,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 
-import java.util.List;
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/partners")
 @RequiredArgsConstructor
@@ -39,14 +38,13 @@ public class PartnerController {
     @Operation(summary = "Создать партнера")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Партнер создан"),
-            @ApiResponse(responseCode = "400", description = "Невалидные данные")
+        @ApiResponse(responseCode = "201", description = "Партнер создан"),
+        @ApiResponse(responseCode = "400", description = "Невалидные данные")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}")
-    )
+            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     public PartnerResponse createPartner(@Valid @RequestBody PartnerRequest request) {
         return partnerClient.createPartner(request);
     }
@@ -54,17 +52,15 @@ public class PartnerController {
     @GetMapping("/{partnerId}/orders")
     @Operation(summary = "Получить все заказы партнера")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Список заказов получен"),
-            @ApiResponse(responseCode = "404", description = "Партнер не найден")
+        @ApiResponse(responseCode = "200", description = "Список заказов получен"),
+        @ApiResponse(responseCode = "404", description = "Партнер не найден")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}")
-    )
+            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     public List<OrderResponse> getOrdersByPartnerId(
-            @Parameter(description = "ID партнера") @PathVariable UUID partnerId
-    ) {
+            @Parameter(description = "ID партнера") @PathVariable UUID partnerId) {
         return partnerClient.getOrdersByPartnerId(partnerId);
     }
 
@@ -72,14 +68,13 @@ public class PartnerController {
     @Operation(summary = "Удалить партнера (каскадно удалятся его заказы)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Партнер удалён"),
-            @ApiResponse(responseCode = "404", description = "Партнер не найден")
+        @ApiResponse(responseCode = "204", description = "Партнер удалён"),
+        @ApiResponse(responseCode = "404", description = "Партнер не найден")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}")
-    )
+            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     public void deletePartner(@Parameter(description = "ID партнера") @PathVariable UUID partnerId) {
         partnerClient.deletePartner(partnerId);
     }
