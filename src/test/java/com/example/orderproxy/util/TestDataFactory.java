@@ -10,45 +10,59 @@ public final class TestDataFactory {
 
     private TestDataFactory() {}
 
+    private static final String DEFAULT_LINK = "https://github.com/Jeexike/order-proxy";
+
     public static OrderRequest orderRequest() {
-        return orderRequest("Order", "Moscow", "SPB", null);
+        return orderRequest("Order", "Moscow", "SPB", DEFAULT_LINK, null);
     }
 
     public static OrderRequest orderRequest(UUID partnerId) {
-        return orderRequest("Order", "Moscow", "SPB", partnerId);
+        return orderRequest("Order", "Moscow", "SPB", DEFAULT_LINK, partnerId);
     }
 
     public static OrderRequest orderRequest(String name, String source, String destination, UUID partnerId) {
+        return orderRequest(name, source, destination, DEFAULT_LINK, partnerId);
+    }
+
+    public static OrderRequest orderRequest(
+            String name, String source, String destination, String link, UUID partnerId) {
         OrderRequest request = new OrderRequest();
         request.setName(name);
         request.setSource(source);
         request.setDestination(destination);
+        request.setLink(link);
         request.setPartnerId(partnerId);
         return request;
     }
 
     public static OrderRequest invalidOrderRequest() {
-        return orderRequest("", "A", "B", null);
+        return orderRequest("", "A", "B", DEFAULT_LINK, null);
     }
 
     public static OrderResponse orderResponse() {
-        return orderResponse(UUID.randomUUID(), "Order", "Moscow", "SPB", null);
+        return orderResponse(UUID.randomUUID(), "Order", "Moscow", "SPB", DEFAULT_LINK, null);
     }
 
     public static OrderResponse orderResponse(UUID id) {
-        return orderResponse(id, "Order", "Moscow", "SPB", null);
+        return orderResponse(id, "Order", "Moscow", "SPB", DEFAULT_LINK, null);
     }
 
     public static OrderResponse orderResponse(UUID id, UUID partnerId) {
-        return orderResponse(id, "Order", "Moscow", "SPB", partnerId);
+        return orderResponse(id, "Order", "Moscow", "SPB", DEFAULT_LINK, partnerId);
     }
 
     public static OrderResponse orderResponse(UUID id, String name, String source, String destination, UUID partnerId) {
+        return orderResponse(id, name, source, destination, DEFAULT_LINK, partnerId);
+    }
+
+    public static OrderResponse orderResponse(
+            UUID id, String name, String source, String destination, String link, UUID partnerId) {
         OrderResponse response = new OrderResponse();
         response.setId(id);
         response.setName(name);
         response.setSource(source);
         response.setDestination(destination);
+        response.setLink(link);
         response.setPartnerId(partnerId);
         return response;
     }

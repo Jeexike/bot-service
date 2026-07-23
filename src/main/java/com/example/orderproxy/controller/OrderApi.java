@@ -26,8 +26,8 @@ public interface OrderApi {
     @GetMapping("/{id}")
     @Operation(summary = "Получить заказ по ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Заказ найден"),
-            @ApiResponse(responseCode = "404", description = "Заказ не найден")
+        @ApiResponse(responseCode = "200", description = "Заказ найден"),
+        @ApiResponse(responseCode = "404", description = "Заказ не найден")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,
@@ -47,8 +47,8 @@ public interface OrderApi {
     @Operation(summary = "Создать новый заказ")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Заказ создан"),
-            @ApiResponse(responseCode = "400", description = "Невалидные данные")
+        @ApiResponse(responseCode = "201", description = "Заказ создан"),
+        @ApiResponse(responseCode = "400", description = "Невалидные данные")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,
@@ -59,9 +59,9 @@ public interface OrderApi {
     @PutMapping("/{id}")
     @Operation(summary = "Обновить существующий заказ")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Заказ обновлён"),
-            @ApiResponse(responseCode = "404", description = "Заказ не найден"),
-            @ApiResponse(responseCode = "400", description = "Невалидные данные")
+        @ApiResponse(responseCode = "200", description = "Заказ обновлён"),
+        @ApiResponse(responseCode = "404", description = "Заказ не найден"),
+        @ApiResponse(responseCode = "400", description = "Невалидные данные")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,
@@ -74,8 +74,8 @@ public interface OrderApi {
     @Operation(summary = "Удалить заказ")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Заказ удалён"),
-            @ApiResponse(responseCode = "404", description = "Заказ не найден")
+        @ApiResponse(responseCode = "204", description = "Заказ удалён"),
+        @ApiResponse(responseCode = "404", description = "Заказ не найден")
     })
     @Retryable(
             retryFor = WebClientRequestException.class,

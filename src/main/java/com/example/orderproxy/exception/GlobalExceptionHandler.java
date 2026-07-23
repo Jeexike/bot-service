@@ -3,13 +3,13 @@ package com.example.orderproxy.exception;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -27,11 +27,22 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST, "Validation failed", fieldErrors);
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+
+        String message = "Parameter '%s' has invalid value".formatted(ex.getName());
+        log.warn("{}: {}", message, ex.getValue());
+        return buildError(HttpStatus.BAD_REQUEST, message, null);
+    }
+
     @ExceptionHandler(WebClientResponseException.class)
     public ResponseEntity<String> handleUpstreamError(WebClientResponseException ex) {
 
-        log.warn("Order service returned an error: {} {} - {}",
-                ex.getStatusCode().value(), ex.getStatusText(), ex.getResponseBodyAsString());
+        log.warn(
+                "Order service returned an error: {} {} - {}",
+                ex.getStatusCode().value(),
+                ex.getStatusText(),
+                ex.getResponseBodyAsString());
 
         return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
     }
