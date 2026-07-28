@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.client.RestClientException;
 
 public interface PartnerApi {
 
@@ -31,7 +31,7 @@ public interface PartnerApi {
         @ApiResponse(responseCode = "400", description = "Невалидные данные")
     })
     @Retryable(
-            retryFor = WebClientRequestException.class,
+            retryFor = RestClientException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
             backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     PartnerResponse createPartner(@Valid @RequestBody PartnerRequest request);
@@ -43,7 +43,7 @@ public interface PartnerApi {
         @ApiResponse(responseCode = "404", description = "Партнер не найден")
     })
     @Retryable(
-            retryFor = WebClientRequestException.class,
+            retryFor = RestClientException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
             backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     List<OrderResponse> getOrdersByPartnerId(@Parameter(description = "ID партнера") @PathVariable UUID partnerId);
@@ -56,7 +56,7 @@ public interface PartnerApi {
         @ApiResponse(responseCode = "404", description = "Партнер не найден")
     })
     @Retryable(
-            retryFor = WebClientRequestException.class,
+            retryFor = RestClientException.class,
             maxAttemptsExpression = "${rest-client.max-attempts}",
             backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     void deletePartner(@Parameter(description = "ID партнера") @PathVariable UUID partnerId);

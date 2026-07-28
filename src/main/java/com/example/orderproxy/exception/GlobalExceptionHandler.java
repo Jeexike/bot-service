@@ -9,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Slf4j
 @RestControllerAdvice
@@ -35,8 +35,8 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST, message, null);
     }
 
-    @ExceptionHandler(WebClientResponseException.class)
-    public ResponseEntity<String> handleUpstreamError(WebClientResponseException ex) {
+    @ExceptionHandler(RestClientResponseException.class)
+    public ResponseEntity<String> handleUpstreamError(RestClientResponseException ex) {
 
         log.warn(
                 "Order service returned an error: {} {} - {}",
@@ -47,8 +47,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
     }
 
-    @ExceptionHandler(WebClientRequestException.class)
-    public ResponseEntity<Map<String, Object>> handleServiceUnavailable(WebClientRequestException ex) {
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<Map<String, Object>> handleServiceUnavailable(ResourceAccessException ex) {
 
         log.error("Order service is unavailable", ex);
         return buildError(HttpStatus.SERVICE_UNAVAILABLE, "Order service is unavailable", null);
