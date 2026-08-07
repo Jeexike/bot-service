@@ -23,6 +23,11 @@ public class OrderResponse {
     @Schema(description = "Точка назначения", example = "Санкт-Петербург")
     private String destination;
 
+    @Schema(
+            description = "Ссылка на GitHub-репозиторий, связанный с заказом",
+            example = "https://github.com/Jeexike/order-proxy")
+    private String link;
+
     @Schema(description = "ID партнера")
     private UUID partnerId;
 

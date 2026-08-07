@@ -6,44 +6,32 @@ import com.example.orderproxy.dto.PartnerResponse;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 @Component
 public class PartnerClient {
 
-    private final WebClient webClient;
+    private final RestClient restClient;
 
-    public PartnerClient(@Qualifier("partnerWebClient") WebClient webClient) {
-        this.webClient = webClient;
+    public PartnerClient(@Qualifier("partnerRestClient") RestClient restClient) {
+        this.restClient = restClient;
     }
 
     public PartnerResponse createPartner(PartnerRequest request) {
-        return webClient
-                .post()
-                .uri("")
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(PartnerResponse.class)
-                .block();
+        return restClient.post().body(request).retrieve().body(PartnerResponse.class);
     }
 
     public List<OrderResponse> getOrdersByPartnerId(UUID partnerId) {
-        return webClient
+        return restClient
                 .get()
                 .uri("/{partnerId}/orders", partnerId)
                 .retrieve()
-                .bodyToFlux(OrderResponse.class)
-                .collectList()
-                .block();
+                .body(new ParameterizedTypeReference<List<OrderResponse>>() {});
     }
 
     public void deletePartner(UUID partnerId) {
-        webClient
-                .delete()
-                .uri("/{partnerId}", partnerId)
-                .retrieve()
-                .toBodilessEntity()
-                .block();
+        restClient.delete().uri("/{partnerId}", partnerId).retrieve().toBodilessEntity();
     }
 }
