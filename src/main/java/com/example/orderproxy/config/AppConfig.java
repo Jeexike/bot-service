@@ -1,15 +1,18 @@
 package com.example.orderproxy.config;
 
-import java.net.http.HttpClient;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
+import org.springframework.boot.http.client.HttpClientSettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
+@EnableConfigurationProperties(RestClientProperties.class)
 @RequiredArgsConstructor
 public class AppConfig {
 
@@ -28,13 +31,12 @@ public class AppConfig {
 
     private RestClient buildRestClient(String baseUrl) {
 
-        HttpClient httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofMillis(properties.getConnectTimeout()))
-                .build();
+        HttpClientSettings settings = HttpClientSettings.defaults()
+                .withConnectTimeout(Duration.ofMillis(properties.getConnectTimeout()))
+                .withReadTimeout(Duration.ofMillis(properties.getReadTimeout()));
 
-        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
-
-        requestFactory.setReadTimeout(Duration.ofMillis(properties.getReadTimeout()));
+        ClientHttpRequestFactory requestFactory =
+                ClientHttpRequestFactoryBuilder.jdk().build(settings);
 
         return RestClient.builder()
                 .baseUrl(baseUrl)

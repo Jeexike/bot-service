@@ -16,7 +16,7 @@ public class OrderLinkChangedConsumer {
     private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "${tracking.outbox.topic}", groupId = "${spring.kafka.consumer.group-id}")
-    public void onMessage(String payload) {
+    public void consume(String payload) {
         try {
             OrderLinkChangedEvent event = objectMapper.readValue(payload, OrderLinkChangedEvent.class);
             log.info(
@@ -27,6 +27,8 @@ public class OrderLinkChangedConsumer {
                     event.detectedAt());
         } catch (JacksonException e) {
             log.error("Failed to process order link change message: {}", payload, e);
+        } catch (Exception e) {
+            log.error("Unexpected error while processing order link change message: {}", payload, e);
         }
     }
 }
