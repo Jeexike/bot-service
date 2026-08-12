@@ -1,5 +1,7 @@
 package com.example.orderproxy.exception;
 
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +54,29 @@ public class GlobalExceptionHandler {
 
         log.error("Order service is unavailable", ex);
         return buildError(HttpStatus.SERVICE_UNAVAILABLE, "Order service is unavailable", null);
+    }
+
+    @ExceptionHandler(OrderServiceUnavailableException.class)
+    public ResponseEntity<Map<String, Object>> handleOrderServiceUnavailable(OrderServiceUnavailableException ex) {
+
+        log.error("Order service call failed, circuit breaker fallback engaged", ex);
+        return buildError(
+                HttpStatus.SERVICE_UNAVAILABLE, "Order service is temporarily unavailable, try again later", null);
+    }
+
+    @ExceptionHandler(CallNotPermittedException.class)
+    public ResponseEntity<Map<String, Object>> handleCircuitOpen(CallNotPermittedException ex) {
+
+        log.warn("Circuit breaker '{}' is OPEN, request rejected fast", ex.getCausingCircuitBreakerName());
+        return buildError(
+                HttpStatus.SERVICE_UNAVAILABLE, "Order service is temporarily unavailable, try again later", null);
+    }
+
+    @ExceptionHandler(RequestNotPermitted.class)
+    public ResponseEntity<Map<String, Object>> handleRateLimit(RequestNotPermitted ex) {
+
+        log.warn("Rate limiter rejected request: {}", ex.getMessage());
+        return buildError(HttpStatus.TOO_MANY_REQUESTS, "Rate limit exceeded, try again later", null);
     }
 
     @ExceptionHandler(Exception.class)

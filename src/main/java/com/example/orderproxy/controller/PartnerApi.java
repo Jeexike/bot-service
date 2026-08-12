@@ -11,15 +11,12 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.client.RestClientException;
 
 public interface PartnerApi {
 
@@ -30,10 +27,6 @@ public interface PartnerApi {
         @ApiResponse(responseCode = "201", description = "Партнер создан"),
         @ApiResponse(responseCode = "400", description = "Невалидные данные")
     })
-    @Retryable(
-            retryFor = RestClientException.class,
-            maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     PartnerResponse createPartner(@Valid @RequestBody PartnerRequest request);
 
     @GetMapping("/{partnerId}/orders")
@@ -42,10 +35,6 @@ public interface PartnerApi {
         @ApiResponse(responseCode = "200", description = "Список заказов получен"),
         @ApiResponse(responseCode = "404", description = "Партнер не найден")
     })
-    @Retryable(
-            retryFor = RestClientException.class,
-            maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     List<OrderResponse> getOrdersByPartnerId(@Parameter(description = "ID партнера") @PathVariable UUID partnerId);
 
     @DeleteMapping("/{partnerId}")
@@ -55,9 +44,5 @@ public interface PartnerApi {
         @ApiResponse(responseCode = "204", description = "Партнер удалён"),
         @ApiResponse(responseCode = "404", description = "Партнер не найден")
     })
-    @Retryable(
-            retryFor = RestClientException.class,
-            maxAttemptsExpression = "${rest-client.max-attempts}",
-            backoff = @Backoff(delayExpression = "${rest-client.backoff-delay}"))
     void deletePartner(@Parameter(description = "ID партнера") @PathVariable UUID partnerId);
 }
