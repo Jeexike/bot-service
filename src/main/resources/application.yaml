@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: order-proxy
+  autoconfigure:
+    exclude: io.github.resilience4j.springboot3.verifier.autoconfigure.SpringBoot3VerifierAutoConfiguration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: order-proxy
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+
+server:
+  port: 8080
+
+rest-client:
+  base-url: http://localhost:8081/orders
+  partners-base-url: http://localhost:8081/partners
+  connect-timeout: 3000
+  read-timeout: 3000
+  max-attempts: 3
+  backoff-delay: 1000
+
+tracking:
+  outbox:
+    topic: order.link.changed
+
+telegram:
+  bot:
+    enabled: true
+    token: ${TELEGRAM_BOT_TOKEN:}
+    username: ${TELEGRAM_BOT_USERNAME:}
+    poll-timeout-seconds: 30
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      orderService:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        record-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+        ignore-exceptions:
+          - org.springframework.web.client.HttpClientErrorException
+          - io.github.resilience4j.ratelimiter.RequestNotPermitted
+  ratelimiter:
+    instances:
+      orderService:
+        limit-for-period: 20
+        limit-refresh-period: 1s
+        timeout-duration: 0s
+  retry:
+    instances:
+      orderService:
+        max-attempts: 3
+        wait-duration: 1s
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+        ignore-exceptions:
+          - org.springframework.web.client.HttpClientErrorException
+          - io.github.resilience4j.ratelimiter.RequestNotPermitted

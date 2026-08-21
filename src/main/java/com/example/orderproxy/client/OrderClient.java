@@ -1,10 +1,11 @@
 package com.example.orderproxy.client;
 
+import static com.example.orderproxy.client.ClientResilienceSupport.rethrowBusinessOrRateLimit;
+import static com.example.orderproxy.client.ClientResilienceSupport.unavailable;
+
 import com.example.orderproxy.dto.OrderRequest;
 import com.example.orderproxy.dto.OrderResponse;
-import com.example.orderproxy.exception.OrderServiceUnavailableException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import java.util.Collections;
@@ -14,13 +15,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OrderClient {
+
+    private static final String CLIENT = "OrderClient";
 
     private final RestClient restClient;
 
@@ -59,43 +61,35 @@ public class OrderClient {
         restClient.delete().uri("/{id}", id).retrieve().toBodilessEntity();
     }
 
+    // Resilience4j вызывает fallback по имени через reflection — сигнатура с Throwable обязательна
+    @SuppressWarnings("unused")
     private OrderResponse getOrderFallback(UUID id, Throwable ex) {
         rethrowBusinessOrRateLimit(ex);
-        throw unavailable("getOrder(" + id + ")", ex);
+        throw unavailable(CLIENT, "getOrder(" + id + ")", ex);
     }
 
+    @SuppressWarnings("unused")
     private List<OrderResponse> getOrdersFallback(Throwable ex) {
         rethrowBusinessOrRateLimit(ex);
         log.warn("Circuit breaker fallback for getOrders(), returning empty list stub. Cause: {}", ex.toString());
         return Collections.emptyList();
     }
 
+    @SuppressWarnings("unused")
     private OrderResponse createOrderFallback(OrderRequest request, Throwable ex) {
         rethrowBusinessOrRateLimit(ex);
-        throw unavailable("createOrder(...)", ex);
+        throw unavailable(CLIENT, "createOrder(...)", ex);
     }
 
+    @SuppressWarnings("unused")
     private OrderResponse updateOrderFallback(UUID id, OrderRequest request, Throwable ex) {
         rethrowBusinessOrRateLimit(ex);
-        throw unavailable("updateOrder(" + id + ")", ex);
+        throw unavailable(CLIENT, "updateOrder(" + id + ")", ex);
     }
 
+    @SuppressWarnings("unused")
     private void deleteOrderFallback(UUID id, Throwable ex) {
         rethrowBusinessOrRateLimit(ex);
-        throw unavailable("deleteOrder(" + id + ")", ex);
-    }
-
-    private static void rethrowBusinessOrRateLimit(Throwable ex) {
-        if (ex instanceof RequestNotPermitted rnp) {
-            throw rnp;
-        }
-        if (ex instanceof HttpClientErrorException hce) {
-            throw hce;
-        }
-    }
-
-    private OrderServiceUnavailableException unavailable(String operation, Throwable ex) {
-        log.error("Resilience fallback triggered for OrderClient.{}: {}", operation, ex.toString());
-        return new OrderServiceUnavailableException("Order service is currently unavailable", ex);
+        throw unavailable(CLIENT, "deleteOrder(" + id + ")", ex);
     }
 }

@@ -1,11 +1,12 @@
 package com.example.orderproxy.client;
 
+import static com.example.orderproxy.client.ClientResilienceSupport.rethrowBusinessOrRateLimit;
+import static com.example.orderproxy.client.ClientResilienceSupport.unavailable;
+
 import com.example.orderproxy.dto.OrderResponse;
 import com.example.orderproxy.dto.PartnerRequest;
 import com.example.orderproxy.dto.PartnerResponse;
-import com.example.orderproxy.exception.OrderServiceUnavailableException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import java.util.Collections;
@@ -15,12 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Component
 public class PartnerClient {
+
+    private static final String CLIENT = "PartnerClient";
 
     private final RestClient restClient;
 
@@ -53,11 +55,13 @@ public class PartnerClient {
         restClient.delete().uri("/{partnerId}", partnerId).retrieve().toBodilessEntity();
     }
 
+    @SuppressWarnings("unused")
     private PartnerResponse createPartnerFallback(PartnerRequest request, Throwable ex) {
         rethrowBusinessOrRateLimit(ex);
-        throw unavailable("createPartner(...)", ex);
+        throw unavailable(CLIENT, "createPartner(...)", ex);
     }
 
+    @SuppressWarnings("unused")
     private List<OrderResponse> getOrdersByPartnerIdFallback(UUID partnerId, Throwable ex) {
         rethrowBusinessOrRateLimit(ex);
         log.warn(
@@ -67,22 +71,9 @@ public class PartnerClient {
         return Collections.emptyList();
     }
 
+    @SuppressWarnings("unused")
     private void deletePartnerFallback(UUID partnerId, Throwable ex) {
         rethrowBusinessOrRateLimit(ex);
-        throw unavailable("deletePartner(" + partnerId + ")", ex);
-    }
-
-    private static void rethrowBusinessOrRateLimit(Throwable ex) {
-        if (ex instanceof RequestNotPermitted rnp) {
-            throw rnp;
-        }
-        if (ex instanceof HttpClientErrorException hce) {
-            throw hce;
-        }
-    }
-
-    private OrderServiceUnavailableException unavailable(String operation, Throwable ex) {
-        log.error("Resilience fallback triggered for PartnerClient.{}: {}", operation, ex.toString());
-        return new OrderServiceUnavailableException("Order service is currently unavailable", ex);
+        throw unavailable(CLIENT, "deletePartner(" + partnerId + ")", ex);
     }
 }
