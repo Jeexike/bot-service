@@ -41,7 +41,8 @@ class ClientResilienceSupportTest {
 
         assertThatThrownBy(() -> ClientResilienceSupport.rethrowBusinessOrRateLimit(notFound))
                 .isInstanceOf(HttpClientErrorException.class)
-                .extracting(ex -> ((HttpClientErrorException) ex).getStatusCode().value())
+                .extracting(
+                        ex -> ((HttpClientErrorException) ex).getStatusCode().value())
                 .isEqualTo(404);
     }
 
@@ -55,8 +56,7 @@ class ClientResilienceSupportTest {
     @DisplayName("unavailable оборачивает причину")
     void unavailableWrapsCause() {
         RuntimeException cause = new RuntimeException("down");
-        OrderServiceUnavailableException ex =
-                ClientResilienceSupport.unavailable("OrderClient", "getOrder", cause);
+        OrderServiceUnavailableException ex = ClientResilienceSupport.unavailable("OrderClient", "getOrder", cause);
 
         assertThat(ex).hasMessageContaining("unavailable").hasCause(cause);
     }

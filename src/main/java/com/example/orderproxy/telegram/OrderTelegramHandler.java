@@ -24,8 +24,7 @@ import org.springframework.web.client.RestClientException;
 @RequiredArgsConstructor
 public class OrderTelegramHandler {
 
-    private static final String HELP =
-            """
+    private static final String HELP = """
             <b>Order Proxy Bot</b>
 
             /start — приветствие
@@ -125,8 +124,7 @@ public class OrderTelegramHandler {
         orderSessions.remove(chatId);
         CreatePartnerSession session = new CreatePartnerSession();
         partnerSessions.put(chatId, session);
-        telegramApi.sendMessage(
-                chatId, "Создание партнёра.\nВведите <b>name</b> (2–255):\n/cancel — отмена");
+        telegramApi.sendMessage(chatId, "Создание партнёра.\nВведите <b>name</b> (2–255):\n/cancel — отмена");
     }
 
     private void continueCreatePartner(long chatId, CreatePartnerSession session, String text) {
@@ -140,8 +138,7 @@ public class OrderTelegramHandler {
                     session.setName(text);
                     session.setStep(CreatePartnerSession.Step.EMAIL);
                     telegramApi.sendMessage(
-                            chatId,
-                            "Введите <b>email</b> или отправьте <code>-</code>, чтобы пропустить:");
+                            chatId, "Введите <b>email</b> или отправьте <code>-</code>, чтобы пропустить:");
                 }
                 case EMAIL -> {
                     if (!"-".equals(text.trim()) && !text.isBlank()) {
@@ -167,11 +164,7 @@ public class OrderTelegramHandler {
             telegramApi.sendMessage(chatId, formatPartner(created, "✅ Партнёр создан"));
         } catch (HttpClientErrorException e) {
             telegramApi.sendMessage(
-                    chatId,
-                    "❌ Ошибка создания ("
-                            + e.getStatusCode().value()
-                            + "):\n"
-                            + e.getResponseBodyAsString());
+                    chatId, "❌ Ошибка создания (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
         } catch (RestClientException e) {
             telegramApi.sendMessage(chatId, "❌ Сервис недоступен: " + e.getMessage());
         } catch (Exception e) {
@@ -216,19 +209,12 @@ public class OrderTelegramHandler {
             partnerClient.deletePartner(id);
             telegramApi.sendMessage(
                     chatId,
-                    "✅ Партнёр <code>"
-                            + id
-                            + "</code> удалён\n"
-                            + "(связанные заказы тоже удаляются каскадно)");
+                    "✅ Партнёр <code>" + id + "</code> удалён\n" + "(связанные заказы тоже удаляются каскадно)");
         } catch (IllegalArgumentException e) {
             telegramApi.sendMessage(chatId, "Некорректный UUID");
         } catch (HttpClientErrorException e) {
             telegramApi.sendMessage(
-                    chatId,
-                    "❌ Ошибка удаления ("
-                            + e.getStatusCode().value()
-                            + "):\n"
-                            + e.getResponseBodyAsString());
+                    chatId, "❌ Ошибка удаления (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
         } catch (RestClientException e) {
             telegramApi.sendMessage(chatId, "❌ Сервис недоступен: " + e.getMessage());
         } catch (Exception e) {
@@ -263,14 +249,12 @@ public class OrderTelegramHandler {
                 case DESTINATION -> {
                     session.setDestination(text);
                     session.setStep(Step.LINK);
-                    telegramApi.sendMessage(
-                            chatId, "Введите <b>GitHub link</b>[](https://github.com/owner/repo):");
+                    telegramApi.sendMessage(chatId, "Введите <b>GitHub link</b>[](https://github.com/owner/repo):");
                 }
                 case LINK -> {
                     session.setLink(text);
                     session.setStep(Step.PARTNER_ID);
-                    telegramApi.sendMessage(
-                            chatId, "Введите <b>partnerId</b> (UUID).\nСписок: /partners");
+                    telegramApi.sendMessage(chatId, "Введите <b>partnerId</b> (UUID).\nСписок: /partners");
                 }
                 case PARTNER_ID -> {
                     session.setPartnerId(UUID.fromString(text.trim()));
@@ -299,11 +283,7 @@ public class OrderTelegramHandler {
             telegramApi.sendMessage(chatId, formatOrder(created, "✅ Заказ создан"));
         } catch (HttpClientErrorException e) {
             telegramApi.sendMessage(
-                    chatId,
-                    "❌ Ошибка создания ("
-                            + e.getStatusCode().value()
-                            + "):\n"
-                            + e.getResponseBodyAsString());
+                    chatId, "❌ Ошибка создания (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
         } catch (RestClientException e) {
             telegramApi.sendMessage(chatId, "❌ Сервис заказов недоступен: " + e.getMessage());
         } catch (Exception e) {
@@ -325,11 +305,7 @@ public class OrderTelegramHandler {
             telegramApi.sendMessage(chatId, "Некорректный UUID");
         } catch (HttpClientErrorException e) {
             telegramApi.sendMessage(
-                    chatId,
-                    "❌ Ошибка удаления ("
-                            + e.getStatusCode().value()
-                            + "):\n"
-                            + e.getResponseBodyAsString());
+                    chatId, "❌ Ошибка удаления (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
         } catch (RestClientException e) {
             telegramApi.sendMessage(chatId, "❌ Сервис заказов недоступен: " + e.getMessage());
         } catch (Exception e) {

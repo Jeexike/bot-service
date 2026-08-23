@@ -106,7 +106,8 @@ class OrderClientResilienceTest {
 
         assertThatThrownBy(() -> orderClient.getOrder(UUID.randomUUID()))
                 .isInstanceOf(HttpClientErrorException.class)
-                .satisfies(ex -> assertThat(((HttpClientErrorException) ex).getStatusCode().value())
+                .satisfies(ex -> assertThat(
+                                ((HttpClientErrorException) ex).getStatusCode().value())
                         .isEqualTo(404));
     }
 

@@ -24,8 +24,8 @@ public interface PartnerApi {
     @Operation(summary = "Создать партнера")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Партнер создан"),
-            @ApiResponse(responseCode = "400", description = "Невалидные данные")
+        @ApiResponse(responseCode = "201", description = "Партнер создан"),
+        @ApiResponse(responseCode = "400", description = "Невалидные данные")
     })
     PartnerResponse createPartner(@Valid @RequestBody PartnerRequest request);
 
@@ -37,16 +37,16 @@ public interface PartnerApi {
     @GetMapping("/{partnerId}")
     @Operation(summary = "Получить партнера по ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Партнер найден"),
-            @ApiResponse(responseCode = "404", description = "Партнер не найден")
+        @ApiResponse(responseCode = "200", description = "Партнер найден"),
+        @ApiResponse(responseCode = "404", description = "Партнер не найден")
     })
     PartnerResponse getPartnerById(@Parameter(description = "ID партнера") @PathVariable UUID partnerId);
 
     @GetMapping("/{partnerId}/orders")
     @Operation(summary = "Получить все заказы партнера")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Список заказов получен"),
-            @ApiResponse(responseCode = "404", description = "Партнер не найден")
+        @ApiResponse(responseCode = "200", description = "Список заказов получен"),
+        @ApiResponse(responseCode = "404", description = "Партнер не найден")
     })
     List<OrderResponse> getOrdersByPartnerId(@Parameter(description = "ID партнера") @PathVariable UUID partnerId);
 
@@ -54,8 +54,8 @@ public interface PartnerApi {
     @Operation(summary = "Удалить партнера (каскадно удалятся его заказы)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Партнер удалён"),
-            @ApiResponse(responseCode = "404", description = "Партнер не найден")
+        @ApiResponse(responseCode = "204", description = "Партнер удалён"),
+        @ApiResponse(responseCode = "404", description = "Партнер не найден")
     })
     void deletePartner(@Parameter(description = "ID партнера") @PathVariable UUID partnerId);
 }

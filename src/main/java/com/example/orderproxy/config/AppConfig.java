@@ -1,8 +1,7 @@
 package com.example.orderproxy.config;
 
-import java.time.Duration;
-
 import com.example.orderproxy.telegram.TelegramProperties;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

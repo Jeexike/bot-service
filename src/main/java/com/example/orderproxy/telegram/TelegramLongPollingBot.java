@@ -51,8 +51,7 @@ public class TelegramLongPollingBot {
     private void pollLoop() {
         while (running.get() && !Thread.currentThread().isInterrupted()) {
             try {
-                GetUpdatesResponse response =
-                        telegramApi.getUpdates(offset.get(), properties.getPollTimeoutSeconds());
+                GetUpdatesResponse response = telegramApi.getUpdates(offset.get(), properties.getPollTimeoutSeconds());
                 if (response == null || !response.isOk() || response.getResult() == null) {
                     continue;
                 }

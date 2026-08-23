@@ -41,21 +41,14 @@ public class PartnerClient {
     @Retry(name = "orderService")
     @CircuitBreaker(name = "orderService", fallbackMethod = "getAllPartnersFallback")
     public List<PartnerResponse> getAllPartners() {
-        return restClient
-                .get()
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<PartnerResponse>>() {});
+        return restClient.get().retrieve().body(new ParameterizedTypeReference<List<PartnerResponse>>() {});
     }
 
     @RateLimiter(name = "orderService")
     @Retry(name = "orderService")
     @CircuitBreaker(name = "orderService", fallbackMethod = "getPartnerByIdFallback")
     public PartnerResponse getPartnerById(UUID partnerId) {
-        return restClient
-                .get()
-                .uri("/{partnerId}", partnerId)
-                .retrieve()
-                .body(PartnerResponse.class);
+        return restClient.get().uri("/{partnerId}", partnerId).retrieve().body(PartnerResponse.class);
     }
 
     @RateLimiter(name = "orderService")

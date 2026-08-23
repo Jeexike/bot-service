@@ -17,9 +17,8 @@ public class TelegramApiClient {
 
     public TelegramApiClient(TelegramProperties properties) {
         this.properties = properties;
-        this.telegramRestClient = RestClient.builder()
-                .baseUrl("https://api.telegram.org")
-                .build();
+        this.telegramRestClient =
+                RestClient.builder().baseUrl("https://api.telegram.org").build();
     }
 
     public boolean isConfigured() {

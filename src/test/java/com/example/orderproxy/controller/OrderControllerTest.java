@@ -54,7 +54,7 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.name").value("Order"))
                 .andExpect(jsonPath("$.source").value("Moscow"))
                 .andExpect(jsonPath("$.destination").value("SPB"))
-                .andExpect(jsonPath("$.link").value("https://github.com/Jeexike/order-service"));
+                .andExpect(jsonPath("$.link").value("https://github.com/Jeexike/order-proxy"));
 
         verify(orderClient).getOrder(id);
     }
@@ -92,7 +92,7 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.name").value("Order"))
                 .andExpect(jsonPath("$.source").value("Moscow"))
                 .andExpect(jsonPath("$.destination").value("SPB"))
-                .andExpect(jsonPath("$.link").value("https://github.com/Jeexike/order-service"))
+                .andExpect(jsonPath("$.link").value("https://github.com/Jeexike/order-proxy"))
                 .andExpect(jsonPath("$.partnerId").value(partnerId.toString()));
 
         verify(orderClient).createOrder(any(OrderRequest.class));
