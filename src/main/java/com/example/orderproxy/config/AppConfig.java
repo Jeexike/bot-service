@@ -1,6 +1,8 @@
 package com.example.orderproxy.config;
 
 import java.time.Duration;
+
+import com.example.orderproxy.telegram.TelegramProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,7 +14,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-@EnableConfigurationProperties(RestClientProperties.class)
+@EnableConfigurationProperties({RestClientProperties.class, TelegramProperties.class})
 @RequiredArgsConstructor
 public class AppConfig {
 

@@ -14,10 +14,11 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
+out/
 
 ### NetBeans ###
 /nbproject/private/
@@ -31,3 +32,32 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### OS ###
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+
+### Logs ###
+*.log
+logs/
+
+### Maven ###
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+dependency-reduced-pom.xml
+.flattened-pom.xml
+
+### Secrets / local env ###
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+### Local Spring overrides ###
+application-local.yaml
+application-local.yml
+application-local.properties

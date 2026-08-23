@@ -39,6 +39,27 @@ public class PartnerClient {
 
     @RateLimiter(name = "orderService")
     @Retry(name = "orderService")
+    @CircuitBreaker(name = "orderService", fallbackMethod = "getAllPartnersFallback")
+    public List<PartnerResponse> getAllPartners() {
+        return restClient
+                .get()
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<PartnerResponse>>() {});
+    }
+
+    @RateLimiter(name = "orderService")
+    @Retry(name = "orderService")
+    @CircuitBreaker(name = "orderService", fallbackMethod = "getPartnerByIdFallback")
+    public PartnerResponse getPartnerById(UUID partnerId) {
+        return restClient
+                .get()
+                .uri("/{partnerId}", partnerId)
+                .retrieve()
+                .body(PartnerResponse.class);
+    }
+
+    @RateLimiter(name = "orderService")
+    @Retry(name = "orderService")
     @CircuitBreaker(name = "orderService", fallbackMethod = "getOrdersByPartnerIdFallback")
     public List<OrderResponse> getOrdersByPartnerId(UUID partnerId) {
         return restClient
@@ -62,10 +83,23 @@ public class PartnerClient {
     }
 
     @SuppressWarnings("unused")
+    private List<PartnerResponse> getAllPartnersFallback(Throwable ex) {
+        rethrowBusinessOrRateLimit(ex);
+        log.warn("Circuit breaker fallback for getAllPartners(), empty list. Cause: {}", ex.toString());
+        return Collections.emptyList();
+    }
+
+    @SuppressWarnings("unused")
+    private PartnerResponse getPartnerByIdFallback(UUID partnerId, Throwable ex) {
+        rethrowBusinessOrRateLimit(ex);
+        throw unavailable(CLIENT, "getPartnerById(" + partnerId + ")", ex);
+    }
+
+    @SuppressWarnings("unused")
     private List<OrderResponse> getOrdersByPartnerIdFallback(UUID partnerId, Throwable ex) {
         rethrowBusinessOrRateLimit(ex);
         log.warn(
-                "Circuit breaker fallback for getOrdersByPartnerId({}), returning empty list stub. Cause: {}",
+                "Circuit breaker fallback for getOrdersByPartnerId({}), empty list. Cause: {}",
                 partnerId,
                 ex.toString());
         return Collections.emptyList();
