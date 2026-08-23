@@ -16,7 +16,14 @@ jobs:
           distribution: temurin
           java-version: "25"
           cache: maven
+      - run: chmod +x ./mvnw
       - run: ./mvnw -B -DskipTests package
       - run: ./mvnw -B test
       - uses: actions/upload-artifact@v4
         if: failure()
+        with:
+          name: test-results
+          path: |
+            target/surefire-reports/
+            target/*.jar
+          if-no-files-found: ignore
