@@ -9,11 +9,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "telegram.bot")
 public class TelegramProperties {
 
-    private String token = "";
+    private String token;
 
-    private String username = "";
+    private String username;
 
-    private int pollTimeoutSeconds = 30;
+    private int pollTimeoutSeconds;
 
-    private boolean enabled = true;
+    private boolean enabled;
 }
