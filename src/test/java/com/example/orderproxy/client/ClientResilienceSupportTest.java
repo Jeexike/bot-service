@@ -3,7 +3,8 @@ package com.example.orderproxy.client;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.example.orderproxy.exception.OrderServiceUnavailableException;
+import com.example.botservice.client.ClientResilienceSupport;
+import com.example.botservice.exception.OrderServiceUnavailableException;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;

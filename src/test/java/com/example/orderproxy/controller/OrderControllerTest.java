@@ -10,9 +10,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.orderproxy.client.OrderClient;
-import com.example.orderproxy.dto.OrderRequest;
-import com.example.orderproxy.dto.OrderResponse;
+import com.example.botservice.client.OrderClient;
+import com.example.botservice.controller.OrderController;
+import com.example.botservice.dto.OrderRequest;
+import com.example.botservice.dto.OrderResponse;
 import com.example.orderproxy.util.SafeResultActions;
 import com.example.orderproxy.util.TestDataFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;

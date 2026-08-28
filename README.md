@@ -1,4 +1,4 @@
-# 🤖 order-proxy
+# 🤖 bot-service
 
 Пограничный (edge) сервис поверх `order-service`: REST-прокси с отказоустойчивым HTTP-клиентом, Telegram-бот для управления заказами и партнёрами в чате, и потребитель Kafka-событий об изменениях в связанных GitHub-репозиториях.
 
@@ -7,15 +7,15 @@
 ## Как это работает вместе
 
 ```
-Telegram ──▶ order-proxy ──REST(resilient)──▶ order-service ──▶ PostgreSQL
+Telegram ──▶ bot-service ──REST(resilient)──▶ order-service ──▶ PostgreSQL
                   ▲                                 │
                   │                                 ▼
                   └──────── Kafka (order.link.changed) ◀── планировщик трекинга
                                                              GitHub-репозиториев
 ```
 
-1. Клиент (REST или Telegram) создаёт заказ здесь, в `order-proxy`, указывая ссылку на GitHub-репозиторий.
-2. `order-proxy` резилиентно проксирует запрос в `order-service`, где заказ сохраняется в PostgreSQL.
+1. Клиент (REST или Telegram) создаёт заказ здесь, в `bot-service`, указывая ссылку на GitHub-репозиторий.
+2. `bot-service` резилиентно проксирует запрос в `order-service`, где заказ сохраняется в PostgreSQL.
 3. Фоновый планировщик `order-service` периодически опрашивает GitHub API по всем заказам и сравнивает состояние репозитория со снапшотом.
 4. При обнаружении изменений событие пишется в транзакционный outbox и асинхронно публикуется в Kafka-топик `order.link.changed`.
 5. Этот сервис потребляет это событие как консьюмер того же топика.

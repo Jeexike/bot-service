@@ -7,10 +7,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.example.orderproxy.client.PartnerClient;
-import com.example.orderproxy.dto.OrderResponse;
-import com.example.orderproxy.dto.PartnerRequest;
-import com.example.orderproxy.dto.PartnerResponse;
+import com.example.botservice.client.PartnerClient;
+import com.example.botservice.controller.PartnerController;
+import com.example.botservice.dto.OrderResponse;
+import com.example.botservice.dto.PartnerRequest;
+import com.example.botservice.dto.PartnerResponse;
 import com.example.orderproxy.util.SafeResultActions;
 import com.example.orderproxy.util.TestDataFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;

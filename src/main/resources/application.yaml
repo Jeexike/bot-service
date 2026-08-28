@@ -1,12 +1,12 @@
 spring:
   application:
-    name: order-proxy
+    name: bot-service
   autoconfigure:
     exclude: io.github.resilience4j.springboot3.verifier.autoconfigure.SpringBoot3VerifierAutoConfiguration
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
-      group-id: order-proxy
+      group-id: bot-service
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       auto-offset-reset: earliest
@@ -32,6 +32,7 @@ telegram:
     token: ${TELEGRAM_BOT_TOKEN:}
     username: ${TELEGRAM_BOT_USERNAME:}
     poll-timeout-seconds: 30
+    schedule-delay-ms: 500
 
 resilience4j:
   circuitbreaker:

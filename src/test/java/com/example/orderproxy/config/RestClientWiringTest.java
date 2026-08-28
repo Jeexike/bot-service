@@ -2,10 +2,11 @@ package com.example.orderproxy.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.orderproxy.client.OrderClient;
-import com.example.orderproxy.client.PartnerClient;
-import com.example.orderproxy.dto.OrderRequest;
-import com.example.orderproxy.dto.PartnerRequest;
+import com.example.botservice.client.OrderClient;
+import com.example.botservice.client.PartnerClient;
+import com.example.botservice.config.AppConfig;
+import com.example.botservice.dto.OrderRequest;
+import com.example.botservice.dto.PartnerRequest;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;

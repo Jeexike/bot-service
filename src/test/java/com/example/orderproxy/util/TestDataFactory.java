@@ -1,9 +1,9 @@
 package com.example.orderproxy.util;
 
-import com.example.orderproxy.dto.OrderRequest;
-import com.example.orderproxy.dto.OrderResponse;
-import com.example.orderproxy.dto.PartnerRequest;
-import com.example.orderproxy.dto.PartnerResponse;
+import com.example.botservice.dto.OrderRequest;
+import com.example.botservice.dto.OrderResponse;
+import com.example.botservice.dto.PartnerRequest;
+import com.example.botservice.dto.PartnerResponse;
 import java.util.UUID;
 
 public final class TestDataFactory {
