@@ -1,4 +1,4 @@
-package com.example.orderproxy.controller;
+package com.example.botservice.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -8,12 +8,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.example.botservice.client.PartnerClient;
-import com.example.botservice.controller.PartnerController;
 import com.example.botservice.dto.OrderResponse;
 import com.example.botservice.dto.PartnerRequest;
 import com.example.botservice.dto.PartnerResponse;
-import com.example.orderproxy.util.SafeResultActions;
-import com.example.orderproxy.util.TestDataFactory;
+import com.example.botservice.util.SafeResultActions;
+import com.example.botservice.util.TestDataFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.UUID;

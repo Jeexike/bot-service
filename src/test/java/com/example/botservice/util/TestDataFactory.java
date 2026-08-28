@@ -1,4 +1,4 @@
-package com.example.orderproxy.util;
+package com.example.botservice.util;
 
 import com.example.botservice.dto.OrderRequest;
 import com.example.botservice.dto.OrderResponse;

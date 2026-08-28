@@ -1,10 +1,9 @@
-package com.example.orderproxy.config;
+package com.example.botservice.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.botservice.client.OrderClient;
 import com.example.botservice.client.PartnerClient;
-import com.example.botservice.config.AppConfig;
 import com.example.botservice.dto.OrderRequest;
 import com.example.botservice.dto.PartnerRequest;
 import com.sun.net.httpserver.HttpServer;

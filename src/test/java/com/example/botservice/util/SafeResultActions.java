@@ -1,4 +1,4 @@
-package com.example.orderproxy.util;
+package com.example.botservice.util;
 
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;

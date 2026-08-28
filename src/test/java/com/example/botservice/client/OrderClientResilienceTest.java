@@ -1,9 +1,9 @@
-package com.example.orderproxy.client;
+package com.example.botservice.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.example.botservice.client.OrderClient;
+import com.example.botservice.BotServiceApplication;
 import com.sun.net.httpserver.HttpServer;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -33,7 +33,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.client.HttpClientErrorException;
 
-@SpringBootTest
+@SpringBootTest(classes = BotServiceApplication.class)
 @ActiveProfiles("resilience")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("OrderClient resilience (CB / RL / Retry)")
