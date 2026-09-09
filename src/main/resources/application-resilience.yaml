@@ -7,7 +7,7 @@ spring:
 
 telegram:
   bot:
-    enabled: false
+    enabled: true
     token: ""
 
 resilience4j:
