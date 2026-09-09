@@ -53,7 +53,7 @@ public class PartnerListCommand implements BotCommand {
             sb.append("Удалить: <code>/partner_delete &lt;uuid&gt;</code>");
             telegramApi.sendMessage(chatId, sb.toString());
         } catch (RestClientException e) {
-            telegramApi.sendMessage(chatId, "❌ Сервис недоступен: " + e.getMessage());
+            telegramApi.sendMessage(chatId, "Сервис недоступен: " + e.getMessage());
         }
     }
 

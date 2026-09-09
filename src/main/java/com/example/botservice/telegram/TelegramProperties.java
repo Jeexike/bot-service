@@ -13,4 +13,6 @@ public class TelegramProperties {
     private String username;
     private int pollTimeoutSeconds;
     private boolean enabled;
+
+    private Long notificationsChatId;
 }

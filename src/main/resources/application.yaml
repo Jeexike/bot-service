@@ -33,6 +33,7 @@ telegram:
     username: ${TELEGRAM_BOT_USERNAME:}
     poll-timeout-seconds: 30
     schedule-delay-ms: 500
+    notifications-chat-id: ${TELEGRAM_NOTIFICATIONS_CHAT_ID:}
 
 resilience4j:
   circuitbreaker:

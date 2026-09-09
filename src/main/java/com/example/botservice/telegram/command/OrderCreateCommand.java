@@ -100,9 +100,9 @@ public class OrderCreateCommand implements BotCommand {
             telegramApi.sendMessage(chatId, formatter.orderCreated(created));
         } catch (HttpClientErrorException e) {
             telegramApi.sendMessage(
-                    chatId, "❌ Ошибка (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
+                    chatId, "Ошибка (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
         } catch (RestClientException e) {
-            telegramApi.sendMessage(chatId, "❌ Сервис недоступен: " + e.getMessage());
+            telegramApi.sendMessage(chatId, "Сервис недоступен: " + e.getMessage());
         }
     }
 

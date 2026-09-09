@@ -1,13 +1,13 @@
 # 🤖 bot-service
 
-Пограничный (edge) сервис поверх `order-service`: REST-прокси с отказоустойчивым HTTP-клиентом, Telegram-бот для управления заказами и партнёрами в чате, и потребитель Kafka-событий об изменениях в связанных GitHub-репозиториях.
+Пограничный (edge) сервис поверх `task-service`: REST-прокси с отказоустойчивым HTTP-клиентом, Telegram-бот для управления заказами и партнёрами в чате, и потребитель Kafka-событий об изменениях в связанных GitHub-репозиториях.
 
-> Часть платформы из двух сервисов. Второй репозиторий — **[order-service](https://github.com/<org>/order-service)**: ядро с заказами, партнёрами, PostgreSQL и трекингом GitHub-репозиториев, который этот сервис проксирует.
+> Часть платформы из двух сервисов. Второй репозиторий — **[task-service](https://github.com/<org>/task-service)**: ядро с заказами, партнёрами, PostgreSQL и трекингом GitHub-репозиториев, который этот сервис проксирует.
 
 ## Как это работает вместе
 
 ```
-Telegram ──▶ bot-service ──REST(resilient)──▶ order-service ──▶ PostgreSQL
+Telegram ──▶ bot-service ──REST(resilient)──▶ task-service ──▶ PostgreSQL
                   ▲                                 │
                   │                                 ▼
                   └──────── Kafka (order.link.changed) ◀── планировщик трекинга
@@ -15,16 +15,16 @@ Telegram ──▶ bot-service ──REST(resilient)──▶ order-service ─�
 ```
 
 1. Клиент (REST или Telegram) создаёт заказ здесь, в `bot-service`, указывая ссылку на GitHub-репозиторий.
-2. `bot-service` резилиентно проксирует запрос в `order-service`, где заказ сохраняется в PostgreSQL.
-3. Фоновый планировщик `order-service` периодически опрашивает GitHub API по всем заказам и сравнивает состояние репозитория со снапшотом.
+2. `bot-service` резилиентно проксирует запрос в `task-service`, где заказ сохраняется в PostgreSQL.
+3. Фоновый планировщик `task-service` периодически опрашивает GitHub API по всем заказам и сравнивает состояние репозитория со снапшотом.
 4. При обнаружении изменений событие пишется в транзакционный outbox и асинхронно публикуется в Kafka-топик `order.link.changed`.
 5. Этот сервис потребляет это событие как консьюмер того же топика.
 
 ## Что делает сервис
 
-- **REST-прокси к order-service** — повторяет контракт `order-service` (`/orders`, `/partners`), но каждый вызов обёрнут в Resilience4j: rate limiter, retry с экспоненциальным backoff и circuit breaker с осмысленным фолбэком (различает бизнес-ошибки 4xx, превышение лимита и реальную недоступность бэкенда).
+- **REST-прокси к task-service** — повторяет контракт `task-service` (`/orders`, `/partners`), но каждый вызов обёрнут в Resilience4j: rate limiter, retry с экспоненциальным backoff и circuit breaker с осмысленным фолбэком (различает бизнес-ошибки 4xx, превышение лимита и реальную недоступность бэкенда).
 - **Telegram-бот** — полноценный интерфейс поверх того же API: пошаговые диалоги (FSM по `chatId`) для создания партнёра и заказа, списки, удаление, help. Работает через long polling к Telegram Bot API.
-- **Kafka-consumer** — слушает топик `order.link.changed`, который наполняет `order-service` при обнаружении изменений в отслеживаемом GitHub-репозитории заказа (пока — логирует событие; точка расширения для уведомлений/интеграций).
+- **Kafka-consumer** — слушает топик `order.link.changed`, который наполняет `task-service` при обнаружении изменений в отслеживаемом GitHub-репозитории заказа (пока — логирует событие; точка расширения для уведомлений/интеграций).
 - **OpenAPI/Swagger** — самодокументируемый REST-слой прокси.
 
 ## Технологический стек
@@ -46,18 +46,18 @@ controller/   REST-контроллеры прокси (Orders, Partners) + Open
 client/       OrderClient / PartnerClient — типобезопасные обёртки над RestClient
               с аннотациями @RateLimiter/@Retry/@CircuitBreaker и общей логикой
               фолбэков (ClientResilienceSupport)
-dto/          Request/Response модели, зеркалящие контракт order-service
+dto/          Request/Response модели, зеркалящие контракт task-service
 kafka/        Consumer события OrderLinkChangedEvent из топика order.link.changed
 telegram/     Long-polling бот: TelegramLongPollingBot, TelegramApiClient (sendMessage/getUpdates),
               OrderTelegramHandler (роутинг команд и диалоги), сессии создания
               заказа/партнёра (CreateOrderSession, CreatePartnerSession)
 exception/    GlobalExceptionHandler, OrderServiceUnavailableException
-config/       RestClient(ы) к order-service, RestClientProperties, OpenAPI
+config/       RestClient(ы) к task-service, RestClientProperties, OpenAPI
 ```
 
 ### Слой отказоустойчивости клиента
 
-`OrderClient`/`PartnerClient` оборачивают каждый вызов к `order-service` в связку `@RateLimiter` → `@Retry` → `@CircuitBreaker`. При открытом circuit breaker или исчерпании retry срабатывает fallback-метод: бизнес-исключения и превышение rate limit пробрасываются как есть (`ClientResilienceSupport.rethrowBusinessOrRateLimit`), а инфраструктурные сбои превращаются в единообразный `OrderServiceUnavailableException` (для `getOrders()` — деградация до пустого списка вместо ошибки).
+`OrderClient`/`PartnerClient` оборачивают каждый вызов к `task-service` в связку `@RateLimiter` → `@Retry` → `@CircuitBreaker`. При открытом circuit breaker или исчерпании retry срабатывает fallback-метод: бизнес-исключения и превышение rate limit пробрасываются как есть (`ClientResilienceSupport.rethrowBusinessOrRateLimit`), а инфраструктурные сбои превращаются в единообразный `OrderServiceUnavailableException` (для `getOrders()` — деградация до пустого списка вместо ошибки).
 
 ### Telegram-бот как второй UI
 
@@ -65,7 +65,7 @@ config/       RestClient(ы) к order-service, RestClientProperties, OpenAPI
 
 ## API
 
-Базовый путь: `/orders`, `/partners` — контракт идентичен `order-service`, но с добавленной устойчивостью к сбоям бэкенда. Полная спецификация — Swagger UI прокси.
+Базовый путь: `/orders`, `/partners` — контракт идентичен `task-service`, но с добавленной устойчивостью к сбоям бэкенда. Полная спецификация — Swagger UI прокси.
 
 ## Telegram-бот: команды
 
@@ -82,13 +82,13 @@ config/       RestClient(ы) к order-service, RestClientProperties, OpenAPI
 
 ## Запуск локально
 
-Сервис использует Kafka из `order-service/compose.yaml` и обращается к `order-service` по REST — оба сервиса должны быть подняты вместе.
+Сервис использует Kafka из `task-service/compose.yaml` и обращается к `task-service` по REST — оба сервиса должны быть подняты вместе.
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-По умолчанию слушает порт `8080` и ждёт `order-service` на `localhost:8081`.
+По умолчанию слушает порт `8080` и ждёт `task-service` на `localhost:8081`.
 
 ### Переменные окружения
 
@@ -100,11 +100,11 @@ config/       RestClient(ы) к order-service, RestClientProperties, OpenAPI
 
 ### Основные настраиваемые параметры (`application.yaml`)
 
-- `rest-client.base-url` / `partners-base-url` — адреса `order-service`
+- `rest-client.base-url` / `partners-base-url` — адреса `task-service`
 - `rest-client.connect-timeout` / `read-timeout` / `max-attempts` / `backoff-delay`
 - `telegram.bot.enabled` — включение/выключение бота
 - `telegram.bot.poll-timeout-seconds` — таймаут long polling
-- `resilience4j.*` — тюнинг устойчивости вызовов к `order-service` (отдельный профиль — в `application-resilience.yaml`)
+- `resilience4j.*` — тюнинг устойчивости вызовов к `task-service` (отдельный профиль — в `application-resilience.yaml`)
 - `tracking.outbox.topic` — топик Kafka, из которого потребляются события об изменении репозиториев
 
 ## Тестирование

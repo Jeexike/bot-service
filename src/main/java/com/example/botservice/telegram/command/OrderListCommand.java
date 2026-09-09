@@ -67,7 +67,7 @@ public class OrderListCommand implements BotCommand {
         } catch (IllegalArgumentException e) {
             telegramApi.sendMessage(chatId, "Некорректный partnerId");
         } catch (RestClientException e) {
-            telegramApi.sendMessage(chatId, "❌ Сервис недоступен: " + e.getMessage());
+            telegramApi.sendMessage(chatId, "Сервис недоступен: " + e.getMessage());
         }
     }
 

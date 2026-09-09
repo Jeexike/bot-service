@@ -40,14 +40,14 @@ public class PartnerDeleteCommand implements BotCommand {
         try {
             UUID id = UUID.fromString(parts[1].trim());
             partnerClient.deletePartner(id);
-            telegramApi.sendMessage(chatId, "✅ Партнёр <code>" + id + "</code> удалён\n(заказы удаляются каскадно)");
+            telegramApi.sendMessage(chatId, "Партнёр <code>" + id + "</code> удалён\n(заказы удаляются каскадно)");
         } catch (IllegalArgumentException e) {
             telegramApi.sendMessage(chatId, "Некорректный UUID");
         } catch (HttpClientErrorException e) {
             telegramApi.sendMessage(
-                    chatId, "❌ Ошибка (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
+                    chatId, "Ошибка (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
         } catch (RestClientException e) {
-            telegramApi.sendMessage(chatId, "❌ Сервис недоступен: " + e.getMessage());
+            telegramApi.sendMessage(chatId, "Сервис недоступен: " + e.getMessage());
         }
     }
 

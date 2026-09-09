@@ -82,9 +82,9 @@ public class PartnerCreateCommand implements BotCommand {
             telegramApi.sendMessage(chatId, formatter.partnerCreated(created));
         } catch (HttpClientErrorException e) {
             telegramApi.sendMessage(
-                    chatId, "❌ Ошибка (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
+                    chatId, "Ошибка (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
         } catch (RestClientException e) {
-            telegramApi.sendMessage(chatId, "❌ Сервис недоступен: " + e.getMessage());
+            telegramApi.sendMessage(chatId, "Сервис недоступен: " + e.getMessage());
         }
     }
 

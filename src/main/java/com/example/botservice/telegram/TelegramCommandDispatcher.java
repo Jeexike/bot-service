@@ -37,7 +37,7 @@ public class TelegramCommandDispatcher {
                     command.handle(chatId, text);
                 } catch (Exception e) {
                     log.error("Command /{} failed chatId={}: {}", command.name(), chatId, e.toString());
-                    telegramApi.sendMessage(chatId, "❌ Внутренняя ошибка: " + e.getMessage());
+                    telegramApi.sendMessage(chatId, "Внутренняя ошибка: " + e.getMessage());
                 }
                 return;
             }

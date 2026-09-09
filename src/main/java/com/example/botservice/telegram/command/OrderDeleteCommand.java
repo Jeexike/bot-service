@@ -40,14 +40,14 @@ public class OrderDeleteCommand implements BotCommand {
         try {
             UUID id = UUID.fromString(parts[1].trim());
             orderClient.deleteOrder(id);
-            telegramApi.sendMessage(chatId, "✅ Заказ <code>" + id + "</code> удалён");
+            telegramApi.sendMessage(chatId, "Заказ <code>" + id + "</code> удалён");
         } catch (IllegalArgumentException e) {
             telegramApi.sendMessage(chatId, "Некорректный UUID");
         } catch (HttpClientErrorException e) {
             telegramApi.sendMessage(
-                    chatId, "❌ Ошибка (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
+                    chatId, "Ошибка (" + e.getStatusCode().value() + "):\n" + e.getResponseBodyAsString());
         } catch (RestClientException e) {
-            telegramApi.sendMessage(chatId, "❌ Сервис недоступен: " + e.getMessage());
+            telegramApi.sendMessage(chatId, "Сервис недоступен: " + e.getMessage());
         }
     }
 
